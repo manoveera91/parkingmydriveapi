@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuthOwner;
+use App\Models\AuthUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -23,12 +24,26 @@ class AuthOwnerController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (Auth::guard('owner')->attempt(['email' => $validatedData['email'], 'password' => $validatedData['password']])) {
-            // Authentication successful
+        if (Auth::guard('owner')->attempt(['email' => $validatedData['email'], 'password' => $validatedData['password']]) && 
+        Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+
+            // User Login
+            $user = AuthUser::where('email', $request->email)->first();
+            $userToken = $user->createToken('api_token')->plainTextToken;
+
+            // Owner Login
             $owner = Auth::guard('owner')->user(); // Retrieve the authenticated admin user
             $parkingSpotsLength = $owner->parkingSpots()->count();
-            $token = $owner->createToken('api_token')->plainTextToken; // Generate access token
-            return response()->json(['owner' => $owner, 'access_token' => $token, 'spot_length' => $parkingSpotsLength], 200);
+            $ownerToken = $owner->createToken('api_token')->plainTextToken; // Generate access token
+
+            return response()->json([
+                'user' => $user,
+                'owner' => $owner,
+                'user_access_token' => $userToken,
+                'owner_access_token' => $ownerToken,
+                'token_type' => 'Bearer',
+                'spot_length' => $parkingSpotsLength
+            ], 200);
         } else {
             // Authentication failed
             return response()->json(['error' => 'Username and password is incorrect'], 400);
@@ -75,63 +90,89 @@ class AuthOwnerController extends Controller
                 'email' => 'required|email',
             ]);
 
-            // Check existing user
-            $userExist = AuthOwner::where('email', $validatedData['email'])->first();
-            if ($userExist) {
-                // Auth::guard('owner')->attempt(['email' => $validatedData['email'], 'password' => $validatedData['password']])
-                // if (password_verify($validatedData['password'], $userExist->socialID)) {
-                    // Authentication successful
-                    Auth::guard('owner')->login($userExist);
-                    // $owner = Auth::guard('owner')->user(); // Retrieve the authenticated admin user
-                   
-                    // $parkingSpots = $owner->parkingSpots()->with(['photos', 'authOwner'])->get();
-                    $parkingSpotsLength = $userExist->parkingSpots()->count();
-                    $token = $userExist->createToken('api_token')->plainTextToken; // Generate access token
+            // Check existing User
+            $userExist = AuthUser::where('email', $validatedData['email'])->first();
+
+            // Check existing Owner
+            $ownerExist = AuthOwner::where('email', $validatedData['email'])->first();
+            if ($userExist && $ownerExist) {
+                    // User
+                    $userExist->save();
+                    Auth::login($userExist);
+                    $userToken = $userExist->createToken('api_token')->plainTextToken;
+
+                    // Onwer
+                    Auth::guard('owner')->login($ownerExist);
+                    $parkingSpotsLength = $ownerExist->parkingSpots()->count();
+                    $ownerToken = $ownerExist->createToken('api_token')->plainTextToken; // Generate access token
         
-                    return response()->json(['owner' => $userExist, 'access_token' => $token, 'spot_length' => $parkingSpotsLength], 200);
-                // } else {
-                //     // Authentication failed
-                //     // return response()->json(['error' => $error]);
-                //     // return response()->json(['error' => 'Unauthorized'], 401);
-                // }
-
-                    // Authentication successful
-                    // Auth::guard('owner')->user();
-
-                    // Generate access token
-                    // $token = $userExist->createToken('api_token')->plainTextToken;
-
-                    // return response()->json([
-                    //     'message' => 'Owner login successfully!',
-                    //     'access_token' => $token,
-                    // ], 201);
+                    return response()->json([
+                        'message' => 'User registered successfully!',
+                        'owner' => $ownerExist,
+                        'user' => $userExist,
+                        'user_access_token' => $userToken,
+                        'token_type' => 'Bearer',
+                        'owner_access_token' => $ownerToken,
+                        'spot_length' => $parkingSpotsLength
+                    ], 200);
             } else {
+
                 // Create a new user
-                $user = AuthOwner::create([
+
+                $user = new AuthUser([
+                    'name' => $request->username,
+                    'email' => $request->email,
+                    'password' => bcrypt($request->password),
+                    'mobile' => $request->mobile,
+                    'role' => $request->filled('role') ? $request->role : 0,
+                    'socialID' => $request->password, // Hash the password for security
+                ]);
+
+                // Create a new owner
+                $owner = AuthOwner::create([
                     'username' => $validatedData['username'],
                     'socialID' => $validatedData['password'], // Hash the password for security
                     'email' => $validatedData['email'],
                     'password' => bcrypt($validatedData['password'])
                 ]);
-                          // Login the user
-                Auth::guard('owner')->login($user);
 
-                // Send registration email
-                $mail_status = $this->sendRegisterEmail($user->username, $user->email);
+                if ($user && $owner) {
+                    // user Login
+                    $user->save();
+                    Auth::login($user);
+                    $mail_status = $this->sendRegisterEmail(
+                        $request->username,
+                        $request->email
+                    );
+                    $userToken = $user->createToken('Personal Access Token')->plainTextToken;
+
+                    // Owner Login
+                    Auth::guard('owner')->login($owner);
+
+                    $parkingSpotsLength = 0;
+                    // Generate access token
+                    $ownerToken = $owner->createToken('api_token')->plainTextToken;
+
+                    return response()->json([
+                        'message' => 'User registered successfully!',
+                        'owner' => $owner,
+                        'user' => $user,
+                        'user_access_token' => $userToken,
+                        'token_type' => 'Bearer',
+                        'owner_access_token' => $ownerToken,
+                        'spot_length' => $parkingSpotsLength
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'message' => 'Registered failed!',
+                    ], 400);
+                }
             }
-
-            // Generate access token
-            $token = $user->createToken('api_token')->plainTextToken;
-
-            return response()->json([
-                'message' => 'Owner registered successfully!',
-                'access_token' => $token,
-            ], 201);
+          
         } catch (QueryException $e) {
             if ($e->errorInfo[1] == 1062) { // MySQL unique constraint violation
                 return response()->json(['error' => 'Email already exists'], 409);
             }
-
             return response()->json(['error' => 'Database error'], 500);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -140,42 +181,68 @@ class AuthOwnerController extends Controller
 
     public function register(Request $request) {
         try {
-            // Validate request data
+
             $validatedData = $request->validate([
-                'username' => 'required|string',
-                'password' => 'required|string',
-                'email' => 'required|email|unique:auth_owners,email',
+                'name' => 'required|string',
+                'email' => 'required|string',
+                'password' => 'required|string|confirmed',
+                'password_confirmation' => 'required',
+                'mobile' => 'required|string|min:10|max:10',
+                'role' => 'number',
             ]);
 
-            // Create a new user
-            $user = AuthOwner::create([
-                'username' => $validatedData['username'],
+            // Create a new User
+            $user = new AuthUser([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'mobile' => $request->mobile,
+                'role' => $request->filled('role') ? $request->role : 0,
+                'socialID' => $request->password
+            ]);
+
+            $user->save();
+
+            Auth::login($user);
+
+            $mail_status = $this->sendRegisterEmail(
+                $request->name,
+                $request->email
+            );
+
+            $userToken = $user->createToken('Personal Access Token')->plainTextToken;
+
+            // Create a new owner
+            $owner = AuthOwner::create([
+                'username' => $validatedData['name'],
                 'password' => bcrypt($validatedData['password']), // Hash the password for security
                 'email' => $validatedData['email'],
                 'socialID' => $validatedData['password']
             ]);
 
             // Login the user
-            Auth::guard('owner')->login($user);
+            Auth::guard('owner')->login($owner);
 
-            // Send registration email
-            $mail_status = $this->sendRegisterEmail($user->username, $user->email);
-
+            $parkingSpotsLength = 0;
             // Generate access token
-            $token = $user->createToken('api_token')->plainTextToken;
+            $ownerToken = $owner->createToken('api_token')->plainTextToken;
 
             return response()->json([
                 'message' => 'Owner User created successfully',
-                'access_token' => $token,
+                'user_access_token' => $userToken,
+                'owner_access_token' => $ownerToken,
+                'user' => $user,
+                'owner' => $owner,
+                'spot_length' => $parkingSpotsLength
             ], 201);
+
         } catch (QueryException $e) {
             if ($e->errorInfo[1] == 1062) { // MySQL unique constraint violation
                 return response()->json(['error' => 'Email already exists'], 409);
             }
-
             return response()->json(['error' => 'Database error'], 500);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Email already exists'], 409);
         }
     }
 
