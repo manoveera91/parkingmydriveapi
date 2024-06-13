@@ -36,17 +36,21 @@ class ForgotPasswordController extends Controller
         $password = $credentials['password'];
         $passwordEnc = bcrypt($password);
 
+        $owner = AuthOwner::where('email', $email)->first();
+
+        if ($owner && Hash::check($password, $owner->password)) {
+            return response()->json(['message' => 'Password already has been used'], 400);
+        } else {
+            if ($owner) {
+                $owner->password = $passwordEnc;
+                $owner->save();
+            }
+        }
+
         $reset_password_status = Password::broker('auth_users')->reset($credentials, function ($user, $password) use ($passwordEnc) {
             $user->password = $passwordEnc;
             $user->save();
         });
-
-        $owner = AuthOwner::where('email', $email)->first();
-
-        if ($owner) {
-            $owner->password = $passwordEnc;
-            $owner->save();
-        }
 
         if ($reset_password_status == Password::INVALID_TOKEN) {
             return response()->json(['message' => 'Invalid token provided'], 400);
