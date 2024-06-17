@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('auth_users', function (Blueprint $table) {
-            $table->string('socialID');
+            $table->string('socialID')->default('no-val');
         });
     }
 
