@@ -22,7 +22,7 @@ return [
     'allowed_origins' => [
         env('FRONTEND_URL', 'http://localhost:3000'),
         env('OWNER_FRONTEND_URL', 'http://localhost:3001'),
-        env('SUPER_ADMIN_FRONTEND_URL', 'http://localhost:5173'),
+        env('SUPER_ADMIN_FRONTEND_URL', 'https://pimd-admin-258c53ec3fd2.herokuapp.com'),
     ],
 
     'allowed_origins_patterns' => [],
