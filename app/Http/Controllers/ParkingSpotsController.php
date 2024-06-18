@@ -162,7 +162,7 @@ class ParkingSpotsController extends Controller
 
         return $parkingSpot;
     } catch (\Throwable $th) {
-        return response()->json(['error' => $th], 500);
+        return response()->json(['error' => $user], 500);
         //throw $th;
     }
     }
