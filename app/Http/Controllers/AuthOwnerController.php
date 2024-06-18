@@ -102,7 +102,9 @@ class AuthOwnerController extends Controller
                     $userToken = $userExist->createToken('api_token')->plainTextToken;
 
                     // Onwer
-                    Auth::guard('owner')->login($ownerExist);
+                    $ownerExist->save();
+                    Auth::login($ownerExist);
+                    // Auth::guard('owner')->login($ownerExist);
                     $parkingSpotsLength = $ownerExist->parkingSpots()->count();
                     $ownerToken = $ownerExist->createToken('api_token')->plainTextToken; // Generate access token
         
