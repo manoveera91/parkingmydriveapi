@@ -97,12 +97,12 @@ class AuthOwnerController extends Controller
             $ownerExist = AuthOwner::where('email', $validatedData['email'])->first();
             if ($userExist && $ownerExist) {
                     // User
-                    $logged = $userExist->save();
+                    $userExist->save();
                     Auth::login($userExist);
                     $userToken = $userExist->createToken('api_token')->plainTextToken;
 
                     // Onwer
-                    Auth::guard('owner')->login($ownerExist);
+                    $logged = Auth::guard('owner')->attempt($ownerExist);
                     $parkingSpotsLength = $ownerExist->parkingSpots()->count();
                     $ownerToken = $ownerExist->createToken('api_token')->plainTextToken; // Generate access token
         
