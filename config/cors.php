@@ -20,7 +20,7 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        env('FRONTEND_URL', 'http://localhost:3000'),
+        env('FRONTEND_URL', 'https://pimd-user-10bd201ebd3a.herokuapp.com'),
         env('OWNER_FRONTEND_URL', 'http://localhost:3001'),
         env('SUPER_ADMIN_FRONTEND_URL', 'https://pimd-admin-258c53ec3fd2.herokuapp.com'),
     ],
