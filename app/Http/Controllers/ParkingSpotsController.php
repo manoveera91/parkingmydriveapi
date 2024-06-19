@@ -149,22 +149,23 @@ class ParkingSpotsController extends Controller
 
         // Fetch the currently authenticated user using the AuthOwner model
         // $user = Auth::guard('owner')->user();
+        $user = AuthOwner::findOrFail($request->input('auth_owner_id'));
         // $user = AuthOwner::where('email', $request['email'])->first();
         // Create the parking spot with the user ID
-        $parkingSpot = ParkingSpots::create($request);
-        // $parkingSpot = $user->parkingSpots()->create($request->except('photos'));
+        // $parkingSpot = ParkingSpots::create($request->except('photos'));
+        $parkingSpot = $user->parkingSpots()->create($request->except('photos', 'auth_owner_id'));
 
         // Save photos
-        // if ($request->hasFile('photos')) {
-        //     foreach ($request->file('photos') as $photo) {
-        //         $path = $photo->store('public/photos'); // Adjust the storage path as needed
-        //         $parkingSpot->photos()->create(['photo_path' => $path]);
-        //     }
-        // }
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $path = $photo->store('public/photos'); // Adjust the storage path as needed
+                $parkingSpot->photos()->create(['photo_path' => $path]);
+            }
+        }
 
         return $parkingSpot;
     } catch (\Throwable $th) {
-        return response()->json(['error' => $request['auth_owner_id']], 501);
+        return response()->json(['error' => $th->getMessage()], 500);
         //throw $th;
     }
     }
