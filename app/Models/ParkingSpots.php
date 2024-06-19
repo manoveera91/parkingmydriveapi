@@ -38,7 +38,7 @@ class ParkingSpots extends Model
 
     public function authOwner()
     {
-        return $this->belongsTo(AuthOwner::class);
+        return $this->belongsTo(AuthOwner::class, 'auth_owner_id');
     }
 
     public function bookings()
