@@ -133,6 +133,12 @@ class ParkingSpotsController extends Controller
         // Validate the request data
         $fromDateTime = date('Y-m-d H:i:s', strtotime($request->input('from_date_time')));
         $toDateTime = date('Y-m-d H:i:s', strtotime($request->input('to_date_time')));
+
+        $request->merge([
+            'from_date_time' => $fromDateTime,
+            'to_date_time' => $toDateTime,
+        ]);
+        
         $request->validate([
             'slot_name' => 'required|string|max:255',
             'available_time' => 'required|string',
@@ -149,10 +155,7 @@ class ParkingSpotsController extends Controller
             'auth_owner_id' => 'numeric'
         ]);
 
-        $request->merge([
-            'from_date_time' => $fromDateTime,
-            'to_date_time' => $toDateTime,
-        ]);
+
         // Fetch the currently authenticated user using the AuthOwner model
         // $user = Auth::guard('owner')->user();
         $user = AuthOwner::findOrFail($request->input('auth_owner_id'));
