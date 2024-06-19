@@ -131,6 +131,8 @@ class ParkingSpotsController extends Controller
     {
         try {
         // Validate the request data
+        $fromDateTime = date('Y-m-d H:i:s', strtotime($request->input('from_date_time')));
+        $toDateTime = date('Y-m-d H:i:s', strtotime($request->input('to_date_time')));
         $request->validate([
             'slot_name' => 'required|string|max:255',
             'available_time' => 'required|string',
@@ -139,8 +141,8 @@ class ParkingSpotsController extends Controller
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'available_slots' => 'required|integer',
-            'from_date_time' => 'required|string',
-            'to_date_time' => 'required|string',
+            'from_date_time' => 'required|date_format:Y-m-d H:i:s',
+            'to_date_time' => 'required|date_format:Y-m-d H:i:s',
             'nearby_places' => 'required|string',
             // 'vehicle_types' => 'required|string',
             'vehicle_fees' => 'required|string',
@@ -165,7 +167,7 @@ class ParkingSpotsController extends Controller
 
         return $parkingSpot;
     } catch (\Throwable $th) {
-        return response()->json(['error' => $th->getMessage()], 500);
+        return response()->json(['error' => $fromDateTime], 500);
         //throw $th;
     }
     }
