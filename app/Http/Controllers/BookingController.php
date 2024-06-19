@@ -94,7 +94,7 @@ class BookingController extends Controller
         
         // Fetch the currently authenticated user
         // Check if the user is authenticated
-        if (! $user = AuthUser::findOrFail($request['email'])) {
+        if (! $user = AuthUser::where('email', $request->input('email'))->firstOrFail()) {
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
         // Create the booking with the user ID
