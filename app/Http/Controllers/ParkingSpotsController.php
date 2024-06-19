@@ -15,11 +15,11 @@ class ParkingSpotsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function ownerindex()
+    public function ownerindex($id)
     {
         // Retrieve the authenticated user
-        $user = Auth::guard('owner')->user();
-
+        // $user = Auth::guard('owner')->user();
+        $user = AuthOwner::findOrFail($id);
         // Check if the user is authenticated
         if ($user) {
             // Fetch parking spots associated with the authenticated user
@@ -138,7 +138,7 @@ class ParkingSpotsController extends Controller
             'from_date_time' => $fromDateTime,
             'to_date_time' => $toDateTime,
         ]);
-        
+
         $request->validate([
             'slot_name' => 'required|string|max:255',
             'available_time' => 'required|string',
