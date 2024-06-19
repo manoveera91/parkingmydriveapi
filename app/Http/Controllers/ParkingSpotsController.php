@@ -164,7 +164,7 @@ class ParkingSpotsController extends Controller
 
         return $parkingSpot;
     } catch (\Throwable $th) {
-        return response()->json(['error' => 'err'], 501);
+        return response()->json(['error' => $request['auth_owner_id']], 501);
         //throw $th;
     }
     }
