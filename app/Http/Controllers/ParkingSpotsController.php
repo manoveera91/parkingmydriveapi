@@ -144,14 +144,15 @@ class ParkingSpotsController extends Controller
             'nearby_places' => 'required|string',
             // 'vehicle_types' => 'required|string',
             'vehicle_fees' => 'required|string',
-            'email' => 'required|string'
+            'auth_owner_id' => 'required|string'
         ]);
 
         // Fetch the currently authenticated user using the AuthOwner model
         // $user = Auth::guard('owner')->user();
-        $user = AuthOwner::where('email', $request['email'])->first();
+        // $user = AuthOwner::where('email', $request['email'])->first();
         // Create the parking spot with the user ID
-        $parkingSpot = $user->parkingSpots()->create($request->except('photos'));
+        $parkingSpot = ParkingSpots::create($request->except('photos'));
+        // $parkingSpot = $user->parkingSpots()->create($request->except('photos'));
 
         // Save photos
         if ($request->hasFile('photos')) {

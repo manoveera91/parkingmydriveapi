@@ -11,6 +11,7 @@ class ParkingSpots extends Model
 
     protected $fillable = [
         'slot_name',
+        'auth_owner_id',
         'available_time',
         'photos',
         'google_map',
