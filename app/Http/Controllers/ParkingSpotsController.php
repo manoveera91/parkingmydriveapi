@@ -147,8 +147,8 @@ class ParkingSpotsController extends Controller
         ]);
 
         // Fetch the currently authenticated user using the AuthOwner model
-        $user = Auth::guard('owner')->user();
-
+        // $user = Auth::guard('owner')->user();
+        $user = AuthOwner::where('email', $request['email'])->first();
         // Create the parking spot with the user ID
         $parkingSpot = $user->parkingSpots()->create($request->except('photos'));
 
@@ -162,7 +162,7 @@ class ParkingSpotsController extends Controller
 
         return $parkingSpot;
     } catch (\Throwable $th) {
-        return response()->json(['error' => $user], 501);
+        return response()->json(['error' => $request], 501);
         //throw $th;
     }
     }
