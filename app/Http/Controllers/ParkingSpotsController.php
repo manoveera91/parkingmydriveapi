@@ -152,7 +152,7 @@ class ParkingSpotsController extends Controller
             'nearby_places' => 'required|string',
             // 'vehicle_types' => 'required|string',
             'vehicle_fees' => 'required|string',
-            'auth_owner_id' => 'required|integer'
+            'auth_owner_id' => 'numeric'
         ]);
 
 
