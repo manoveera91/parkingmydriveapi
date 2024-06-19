@@ -150,7 +150,7 @@ class ParkingSpotsController extends Controller
         ]);
 
         $request['from_date_time'] = $fromDateTime;
-
+        $request['to_date_time'] = $toDateTime;
         // Fetch the currently authenticated user using the AuthOwner model
         // $user = Auth::guard('owner')->user();
         $user = AuthOwner::findOrFail($request->input('auth_owner_id'));
