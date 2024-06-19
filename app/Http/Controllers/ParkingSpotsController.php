@@ -151,16 +151,16 @@ class ParkingSpotsController extends Controller
         // $user = Auth::guard('owner')->user();
         // $user = AuthOwner::where('email', $request['email'])->first();
         // Create the parking spot with the user ID
-        $parkingSpot = ParkingSpots::create($request->except('photos'));
+        $parkingSpot = ParkingSpots::create($request);
         // $parkingSpot = $user->parkingSpots()->create($request->except('photos'));
 
         // Save photos
-        if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $photo) {
-                $path = $photo->store('public/photos'); // Adjust the storage path as needed
-                $parkingSpot->photos()->create(['photo_path' => $path]);
-            }
-        }
+        // if ($request->hasFile('photos')) {
+        //     foreach ($request->file('photos') as $photo) {
+        //         $path = $photo->store('public/photos'); // Adjust the storage path as needed
+        //         $parkingSpot->photos()->create(['photo_path' => $path]);
+        //     }
+        // }
 
         return $parkingSpot;
     } catch (\Throwable $th) {
