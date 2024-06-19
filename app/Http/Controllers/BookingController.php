@@ -25,11 +25,11 @@ class BookingController extends Controller
         return response()->json($bookings, 200);
     }
 
-    public function ownerindex()
+    public function ownerindex($id)
     {
         // Retrieve the authenticated owner
-        $owner = Auth::guard('owner')->user();
-
+        // $owner = Auth::guard('owner')->user();
+        $owner = AuthOwner::findOrFail($id);
         // Check if the owner is authenticated
         if ($owner) {
             // Fetch booking history associated with the authenticated owner
@@ -43,7 +43,7 @@ class BookingController extends Controller
             return response()->json($bookings, 200);
         } else {
             // If owner is not authenticated, return an unauthorized response
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => $owner], 500);
         }
     }
 
