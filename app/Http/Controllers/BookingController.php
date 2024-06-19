@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\AuthUser;
 use App\Models\AuthOwner;
 use App\Models\Booking;
 use App\Models\ParkingSpots;
@@ -88,11 +89,12 @@ class BookingController extends Controller
             'total_hours' => 'required|integer',
             'location' => 'required|string|max:255',
             'status' => 'required|string|max:255',
+            'email' => 'required|string'
         ]);
-
+        
         // Fetch the currently authenticated user
         // Check if the user is authenticated
-        if (! $user = Auth::guard('web')->user()) {
+        if (! $user = AuthUser::findOrFail($request['email'])) {
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
         // Create the booking with the user ID
