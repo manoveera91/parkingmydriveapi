@@ -144,6 +144,7 @@ class ParkingSpotsController extends Controller
             'nearby_places' => 'required|string',
             // 'vehicle_types' => 'required|string',
             'vehicle_fees' => 'required|string',
+            'email' => 'required|string'
         ]);
 
         // Fetch the currently authenticated user using the AuthOwner model
@@ -162,7 +163,7 @@ class ParkingSpotsController extends Controller
 
         return $parkingSpot;
     } catch (\Throwable $th) {
-        return response()->json(['error' => $request['slot_name']], 501);
+        return response()->json(['error' => $request['email']], 501);
         //throw $th;
     }
     }
