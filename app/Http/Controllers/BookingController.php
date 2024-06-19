@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\AuthOwner;
 use App\Models\Booking;
 use App\Models\ParkingSpots;
 use App\Models\OwnerPayment;
