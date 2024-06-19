@@ -165,7 +165,7 @@ class ParkingSpotsController extends Controller
 
         return $parkingSpot;
     } catch (\Throwable $th) {
-        return response()->json(['error' => $request['from_date_time']], 500);
+        return response()->json(['error' => $th->getMessage()], 500);
         //throw $th;
     }
     }
