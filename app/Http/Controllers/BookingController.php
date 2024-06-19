@@ -47,11 +47,11 @@ class BookingController extends Controller
         }
     }
 
-    public function ownerpaymentreceivedindex()
+    public function ownerpaymentreceivedindex($id)
     {
         // Retrieve the authenticated owner
-        $owner = Auth::guard('owner')->user();
-
+        // $owner = Auth::guard('owner')->user();
+        $owner = AuthOwner::findOrFail($id);
         // Check if the owner is authenticated
         if ($owner) {
             // Fetch booking history associated with the authenticated owner

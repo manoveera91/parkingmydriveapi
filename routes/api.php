@@ -65,7 +65,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('admin-owner-payment', [ParkingSpotsController::class, 'ownerpaymentIndex']);
     // Route::get('owner-bookings', [BookingController::class, 'ownerindex']);
     Route::get('owner-bookings/{id}', [BookingController::class, 'ownerindex']);
-    Route::get('owner-payment-received', [BookingController::class, 'ownerpaymentreceivedindex']);
+    Route::get('owner-payment-received/{id}', [BookingController::class, 'ownerpaymentreceivedindex']);
     Route::get('owner-details', [ParkingSpotsController::class, 'ownerdetailindex']);
 });
 Route::post('add-booking', [BookingController::class, 'store']);
