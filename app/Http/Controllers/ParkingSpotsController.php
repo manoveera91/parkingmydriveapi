@@ -144,7 +144,7 @@ class ParkingSpotsController extends Controller
             'nearby_places' => 'required|string',
             // 'vehicle_types' => 'required|string',
             'vehicle_fees' => 'required|string',
-            'auth_owner_id' => 'required|string'
+            'auth_owner_id' => 'required|numeric'
         ]);
 
         // Fetch the currently authenticated user using the AuthOwner model
