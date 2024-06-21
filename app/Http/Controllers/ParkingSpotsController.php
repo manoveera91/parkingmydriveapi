@@ -275,6 +275,15 @@ class ParkingSpotsController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        $fromDateTime = date('Y-m-d H:i:s', strtotime($request->input('from_date_time')));
+        $toDateTime = date('Y-m-d H:i:s', strtotime($request->input('to_date_time')));
+
+        $request->merge([
+            'from_date_time' => $fromDateTime,
+            'to_date_time' => $toDateTime,
+        ]);
+        
         //
         $request->validate([
             'slot_name' => 'required|string|max:255',
