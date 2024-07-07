@@ -99,10 +99,10 @@ class BookingController extends Controller
         }
         // Create the booking with the user ID
         $booking = $user->bookings()->create($request->all());
-        if ($booking) {
-            $parkingspot = ParkingSpots::findOrFail($request['parking_spot_id']);
-            $parkingspot->update(['isBooked' => 1]);
-        }
+        // if ($booking) {
+        //     $parkingspot = ParkingSpots::findOrFail($request['parking_spot_id']);
+        //     $parkingspot->update(['isBooked' => true]);
+        // }
      
 
         return response()->json(['message' => 'Booking created successfully', 'booking' => $booking], 201);

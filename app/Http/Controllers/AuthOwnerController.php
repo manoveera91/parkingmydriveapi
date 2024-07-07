@@ -259,7 +259,7 @@ class AuthOwnerController extends Controller
 
             Mail::send('emails.owner_register', $data, function ($message) use ($recipientName, $email) {
                 $message->to($email, $recipientName)
-                    ->subject('Owner Registration');
+                    ->subject('Registration');
             });
 
             return response()->json(['status' => 'success', 'message' => 'Email sent successfully']);

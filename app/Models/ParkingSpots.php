@@ -24,6 +24,7 @@ class ParkingSpots extends Model
         'vehicle_types',
         'vehicle_fees',
         'status',
+        'isBooked'
 
     ];
 

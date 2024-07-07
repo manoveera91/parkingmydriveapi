@@ -162,6 +162,13 @@ class ParkingSpotsController extends Controller
         // $user = AuthOwner::where('email', $request['email'])->first();
         // Create the parking spot with the user ID
         // $parkingSpot = ParkingSpots::create($request->except('photos'));
+        $parkingSpotDuplicate = $user->parkingSpots()->where('google_map', $request->input('google_map'))
+        ->where('from_date_time', $request->input('from_date_time'))
+        ->where('to_date_time', $request->input('from_date_time'))->first();
+        
+        if ($parkingSpotDuplicate) {
+            return response()->json(['error' => 'parking spot already exists'], 409);
+        } 
         $parkingSpot = $user->parkingSpots()->create($request->except('photos', 'auth_owner_id'));
 
         // Save photos
@@ -174,7 +181,7 @@ class ParkingSpotsController extends Controller
 
         return $parkingSpot;
     } catch (\Throwable $th) {
-        return response()->json(['error' => $th->getMessage()], 500);
+        return response()->json(['error' => $th], 500);
         //throw $th;
     }
     }

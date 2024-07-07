@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\ParkingSpots;
 use App\Models\Booking;
 use App\Models\CancelledBooking;
 use Carbon\Carbon;
@@ -171,7 +171,8 @@ class PaymentParkingController extends Controller
                     $booking->payed_on = $today;
                     $booking->status = 'Booked';
                     $booking->update();
-
+                    $parkingSpotId = $booking->parking_spot_id;
+                    ParkingSpots::where('id', $parkingSpotId)->first()->update(['isBooked' => 1]);
                     // $mail_status = $this->$mail_status = $this->sendEmail('Hema', 'm.hema10@gmail.com', 'ParkMyDrive', 'ravikumar.inq@gmail.com', 'Laravel Test Mail', 'A test mail');
                     $mail_status = $this->sendBookingEmail(
 

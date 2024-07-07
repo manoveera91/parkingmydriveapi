@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AuthAdmin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Hash;
 class AuthAdminController extends Controller
 {
     public function login(Request $request)
@@ -18,12 +18,15 @@ class AuthAdminController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (Auth::guard('admin')->attempt(['username' => $validatedData['username'], 'password' => $validatedData['password']])) {
-            // Authentication successful
-            $admin = Auth::guard('admin')->user(); // Retrieve the authenticated admin user
-            $token = $admin->createToken('api_token')->plainTextToken; // Generate access token
+        $userExist = AuthAdmin::where('username', $validatedData['username'])->first();
 
-            return response()->json(['admin' => $admin, 'access_token' => $token], 200);
+        if ($userExist && Hash::check($validatedData['password'], $userExist->password)) {
+            // Authentication successful
+            // $admin = Auth::guard('admin')->user(); // Retrieve the authenticated admin user
+            Auth::login($userExist);
+            $token = $userExist->createToken('api_token')->plainTextToken; // Generate access token
+
+            return response()->json(['admin' => $userExist, 'access_token' => $token], 200);
         } else {
             // Authentication failed
             return response()->json(['error' => 'Unauthorized'], 401);
